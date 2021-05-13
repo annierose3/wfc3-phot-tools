@@ -19,7 +19,7 @@ def _gauss(x, *p):
     return A*np.exp(-(x-mu)**2/(2.*sigma**2))
 
 def calc_1d_gauss_background(data, bins=100, hist_range=(-10, 10)):
-    """ 
+    """
     Fits a 1D gaussian distribution to pixels in `data`, returns mean of fit.
 
     Parameters
@@ -33,7 +33,7 @@ def calc_1d_gauss_background(data, bins=100, hist_range=(-10, 10)):
     Returns
     -------
     coeff : tuple
-        A, mu, sigma of gaussian fit. 
+        A, mu, sigma of gaussian fit.
 
     """
     data = data.flatten()
@@ -85,24 +85,23 @@ def aperture_stats_tbl(data, apertures,
 
     # Get the masks that will be used to identify our desired pixels.
     masks = apertures.to_mask(method=method)
-    
+
     if isinstance(masks, ApertureMask): # fix different return types
-    	masks = [masks] 
-    
+    	masks = [masks]
+
     # Compute the stats of pixels within the masks
     aperture_stats = [calc_aperture_mmm(data, mask, sigma_clip)
                       for mask in masks]
-    
+
     aperture_stats = np.array(aperture_stats)[0]
-    print(np.shape(aperture_stats), np.shape(apertures.positions))
-   
+
     # Place the array of the x y positions alongside the stats
-    stacked = np.hstack([apertures.positions[0], aperture_stats])
-    
+    stacked = np.hstack([apertures.positions, aperture_stats])
+
     # Name the columns
     names = ['X', 'Y', 'aperture_mean', 'aperture_median', 'aperture_mode',
             'aperture_std', 'aperture_area']
-    
+
     # Make the table
     stats_tbl = Table(data=stacked, names=names)
 
