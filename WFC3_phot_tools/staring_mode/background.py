@@ -86,8 +86,8 @@ def aperture_stats_tbl(data, apertures,
     # Get the masks that will be used to identify our desired pixels.
     masks = apertures.to_mask(method=method)
 
-    if isinstance(masks, ApertureMask): # fix different return types
-    	masks = [masks]
+    if isinstance(masks, ApertureMask):
+        masks = [masks]
 
     # Compute the stats of pixels within the masks
     aperture_stats = [calc_aperture_mmm(data, mask, sigma_clip)
@@ -97,11 +97,9 @@ def aperture_stats_tbl(data, apertures,
 
     # Place the array of the x y positions alongside the stats
     stacked = np.hstack([apertures.positions, aperture_stats])
-
     # Name the columns
     names = ['X', 'Y', 'aperture_mean', 'aperture_median', 'aperture_mode',
             'aperture_std', 'aperture_area']
-
     # Make the table
     stats_tbl = Table(data=stacked, names=names)
 
