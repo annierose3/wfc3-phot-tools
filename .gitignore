@@ -1,0 +1,14 @@
+# Do not track files in these directories
+/build
+/dist
+/WFC3_phot_tools.egg-info
+/WFC3_phot_tools/.___init__.py
+/WFC3_phot_tools/.___pycache__
+/WFC3_phot_tools/._data_tools
+/WFC3_phot_tools/._spatial_scan
+/WFC3_phot_tools/._staring_mode
+/WFC3_phot_tools/._utils
+
+# Do not track files of these types:
+.DS_Store
+*.pyc
