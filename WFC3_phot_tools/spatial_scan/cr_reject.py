@@ -1,25 +1,17 @@
-import copy
-import os
-import glob
-
-from astropy.io import fits
-import copy
-import numpy as np
-import pandas as pd
-from scipy import interpolate
-from scipy.signal import medfilt
-from scipy.ndimage import label, generate_binary_structure
-from scipy.ndimage.measurements import find_objects
-
-""" Contains functions for identifying and reparing CR hits
+"""
+    Contains functions for identifying and reparing CR hits
     in spatially scanned data. Optimized for WFC3/UVIS
     scans that are nearly vertical or horizontal. Adapted
     from an IDL routine by S. Casertano for STIS.
 
     Authors
     -------
-    Mariarosa Marinelli, Jan 2022
-    Clare Shanahan, May 2018
+        Mariarosa Marinelli, Jan 2022
+        Clare Shanahan, May 2018
+
+    Use
+    ---
+        This script is intended to be imported.
 
     Notes
     -----
@@ -33,7 +25,7 @@ from scipy.ndimage.measurements import find_objects
     universally useful and output should be inspected
     carefully.
 
-    The main routine is in `mask_and_repair_flagged_pixels`.
+    The main routine is `mask_and_repair_flagged_pixels`.
     This function takes in a 2D data array and returns the
     corrected data and the mask indicating CR hits. This
     function calls make_cr_mask as a first pass to identify
@@ -49,21 +41,23 @@ from scipy.ndimage.measurements import find_objects
 
 """
 
+import os
+import copy
+import glob
+import numpy as np
+import pandas as pd
+from astropy.io import fits
+from scipy import interpolate
+from scipy.ndimage import generate_binary_structure, label
+from scipy.ndimage.measurements import find_objects
+from scipy.signal import medfilt
+
 def unmask_isolated_pixels(data):
     """
     Helper function to remove the CR mask for isolated
     pixels. Here, we have defined isolated pixels as
     touching fewer than 2 other pixels, including
     diagonally.
-
-    Notes
-    -----
-        To account for endian weirdness of input data, this
-        function begin with adding a float zero to the data
-
-        See documentation of this issue at:
-            https://github.com/astropy/astropy/issues/1156
-
 
     Parameters
     ----------
@@ -75,14 +69,23 @@ def unmask_isolated_pixels(data):
     unmasked_array : 'numpy.ndarray'
         Array of CR mask data with isolated pixels removed.
 
+    Notes
+    -----
+        To account for endian weirdness of input data, this
+        function begin with adding a float zero to the data
+
+        See documentation of this issue at:
+            https://github.com/astropy/astropy/issues/1156
+
     """
     array = data + 0.
 
-    s = generate_binary_structure(2,2)
+    s = generate_binary_structure(np.ndim(array), 1)
 
     labeled_array, num_features = label(array, structure=s)
 
     feature_labels = []
+
     for i in range(num_features):
         loc = find_objects(labeled_array)[i]
 
@@ -133,7 +136,7 @@ def make_cr_mask(data, nlen=4, ncomp=10, mult=4):
 
     Parameters
     ----------
-    data : `np.array`
+    data : `numpy.ndarray`
         2D numpy array of floats.
     nlen : int
         Integer number of pixels above and below a given
@@ -147,7 +150,7 @@ def make_cr_mask(data, nlen=4, ncomp=10, mult=4):
 
     Returns
     -------
-    mask : `np.array`
+    mask : `numpy.ndarray`
         2D numpy boolean mask for data marking locations
         of detected CRs. Pixels with value 1 signify clean
         data, and 0 indicate a CR.
@@ -193,26 +196,30 @@ def _fill_nan_interp(im_arr):
     Notes
     -----
         Currently does not handle top 10/bottom 10 rows as
-        intended.
+        intended. Has trouble at the edges of the detector
+        (ex. the top of the Amp A 512x512 subarray).
 
     Parameters
     ----------
-    im_arr : `np.array`
+    im_arr : `numpy.ndarray`
         2D array of input data containing NaNs.
 
     Returns
     -------
-    trans_im_arr.T : `np.array`
+    trans_im_arr.T : `numpy.ndarray`
         2D array of input data, with interpolated values.
 
     """
     trans_im_arr = im_arr.T
 
     for c in range(0, im_arr.shape[1]):
+        print(c)
         row = trans_im_arr[c]  # this doesn't do anything really
-        if row[0] == np.nan:
+        if np.isnan(row[0]):
+            print(f'first if: {row[~np.isnan(row)][0]}')
             row[0] = row[~np.isnan(row)][0]
-        if row[-1] == np.nan:
+        if np.isnan(row[-1]):
+            print(f'second if: {~np.isnan(row)[-1]}')
             row[-1] = row[~np.isnan(row)][-1]
         trans_im_arr[c] = pd.Series(row).interpolate()
     return trans_im_arr.T
@@ -274,17 +281,18 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
 
     Parameters
     ----------
-    data : `np.array`
+    data : `numpy.ndarray`
         2D array of data
     scan_orient : str
         'V' for vertical scans or 'H' for horizontal.
 
     Returns
     -------
-    (corrected_data, mask) : Tuple of 'np.array'
+    (corrected_data, mask) : Tuple of 'numpy.ndarray'
         Tuple of 2D arrays containing the repaired data,
         and mask, respectivley.
     """
+    print('New version imported.')
 
     data = copy.copy(data)
 
@@ -299,10 +307,7 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
 
     # replace masked pix with the linear interp. of the nearest 2 unmasked pix
     k = np.where(mask > 0)
-
-    if len(k) > 0:
-        data[k] = np.nan
-
+    data[k] = np.nan
     data = _fill_nan_interp(data)
 
     # pass #2
@@ -353,15 +358,14 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
     corrected_data = _fill_nan_interp(data)
 
     if scan_orient == 'H':
-        data = corrected_data.T
+        corrected_data = corrected_data.T
         mask = mask.T
 
-    return (data, mask)
+    return (corrected_data, mask)
 
-
-def _write_fcr(input_file, output_dir, masked_im, ext, file_type):
+def _write_fcr(input_file, output_dir, corrected_data, ext, file_type):
     """
-    Writes out CR corrected data (masked_im) as single
+    Writes out CR corrected data (corrected_data) as single
     extension fits file in output_dir. The 0th and 'ext'
     headers are concatenated and written to the output
     file. The name of this file will be the same as the
@@ -370,16 +374,17 @@ def _write_fcr(input_file, output_dir, masked_im, ext, file_type):
 
     Parameters
     ----------
-    input_file :
-
-    output_dir :
-
-    masked_im :
+    input_file : str
+        Full path to input fits file.
+    output_dir : str
+        Directory where corrected files should be output.
+        Defaults to input_file directory.
+    corrected_data :
 
     ext :
 
-    file_type :
-
+    file_type : str
+        Either 'flt' or 'flc'.
 
     """
 
@@ -387,7 +392,7 @@ def _write_fcr(input_file, output_dir, masked_im, ext, file_type):
     hdr_out = fits.open(input_file)[0].header + \
         fits.open(input_file)['SCI', ext].header
 
-    hdu_new = fits.PrimaryHDU(masked_im, header=hdr_out)
+    hdu_new = fits.PrimaryHDU(corrected_data, header=hdr_out)
     output_path = output_dir+os.path.basename(input_file).\
         replace('{}.fits'.format(file_type), 'fcr.fits')
 
@@ -404,14 +409,17 @@ def _write_mask(input_file, output_dir, mask, ext, file_type):
 
     Parameters
     ----------
-    input_file :
-
-    output_dir :
-
-    mask :
-
-    ext :
-
+    input_file : str
+        Full path to input fits file.
+    output_dir : str
+        Directory where corrected files should be output.
+        Defaults to input_file directory.
+    mask : `numpy.ndarray`
+        2D numpy boolean mask for data marking locations
+        of detected CRs. Pixels with value 1 signify clean
+        data, and 0 indicate a CR.
+    ext : int
+        FITS extension of data.
     file_type :
 
     """
@@ -460,9 +468,12 @@ def make_crcorr_file_scan_wfc3(input_file, mult=4, output_dir=None, ext=1,
     ----------
     input_file : str
         Full path to input fits file.
+    mult : int
+        Sigma, above the median, used as a threshold for a
+        CR detection.
     output_dir : str
         Directory where corrected files should be output.
-        Defaults to input_file directory.
+        If None, defaults to input_file directory.
     ext : int
         FITS extension of data.
     write_mask : bool
@@ -501,9 +512,9 @@ def make_crcorr_file_scan_wfc3(input_file, mult=4, output_dir=None, ext=1,
     scan_orient = _determine_scan_orientation_wfc3(hdr0)
 
     # call CR rejection routine
-    masked_im, mask = mask_and_repair_flagged_pixels(data, scan_orient, mult)
+    corrected_data, mask = mask_and_repair_flagged_pixels(data, scan_orient, mult)
 
-    _write_fcr(input_file, output_dir, masked_im, ext, file_type)
+    _write_fcr(input_file, output_dir, corrected_data, ext, file_type)
 
     if write_mask:
         _write_mask(input_file, output_dir, mask, ext, file_type)
