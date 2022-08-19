@@ -1,22 +1,61 @@
-from astropy.io import fits
+"""
+    This module contains a function to correct geometric
+    distortion in UVIS FLT (flat-fielded) images. By
+    multiplying the data from the FLT by the appropriate
+    Pixel Area Map (PAM), any given source will yield a
+    count-rate equivalent to what would have been achieved
+    by drizzling multiple FLTs together.
+
+    For more background, see:
+        "Pixel Area Maps"
+            www.stsci.edu/hst/instrumentation/wfc3/data-analysis/pixel-area-maps
+        "WFC3 Pixel Area Maps"
+            WFC3 Instrument Science Report 2010-08
+            Kalirai et al.
+        "WFC3 Chip Dependent Photometry with the UV filters"
+            WFC3 Instrument Science Report 2017-07
+            Deustua et al.
+
+    Author
+    ------
+    Clare Shanahan, Dec 2019
+    Mariarosa Marinelli, 2022
+
+    Use
+    ---
+        This script is intended to imported.
+
+    To-Do
+    -----
+    - Add PAM maps to github repo
+
+"""
+
 import copy
 import numpy as np
-
+from astropy.io import fits
 
 def make_PAMcorr_image_UVIS(data, prihdr, scihdr, pamdir):
-    """Creates the Pixel Area Map (PAM) image.
-    Parameters:
-        data : array
-            Name of FITS file.
-        pri : header
-            Primary header of file for data.
-        scihdr : header
-            Header from science extension of data.
-        pamdir : str
-            Path to where pixel area maps for UVIS1 and/or UVIS2 are located.
-    Returns:
-        pamcorr_data : array
-            PAM corrected data
+    """
+    Corrects the geometric distortion of the input image
+    data by multiplying by the correct UVIS PAM.
+
+    Parameters
+    ----------
+    data : array
+        ****Name of FITS file.
+    pri : header
+        Primary header of file for data.
+    scihdr : header
+        Header from science extension of data.
+    pamdir : str
+        Path to where pixel area maps for UVIS1 and/or
+        UVIS2 are located.
+
+    Returns
+    -------
+    pamcorr_data : array
+        PAM-corrected data
     """
 
     data = copy.copy(data)
