@@ -1,18 +1,20 @@
 """
-Tools for computing backgroun statistics within photutils apertures.
+    Tools for computing background statistics within
+    photutils apertures.
 
-Authors
--------
-    - Varun Bajaj, December 2017
-    - Clare Shanahan, December 2019
+    Authors
+    -------
+        Varun Bajaj, December 2017
+        Clare Shanahan, December 2019
+        Mariarosa Marinelli, June 2022
 
 """
-from photutils.aperture.mask import ApertureMask
-from astropy.table import Table
 import numpy as np
-from scipy.stats import sigmaclip
-from scipy.signal import find_peaks
+from astropy.table import Table
+from photutils.aperture.mask import ApertureMask
 from scipy.optimize import curve_fit
+from scipy.signal import find_peaks
+from scipy.stats import sigmaclip
 
 def _gauss(x, *p):
     A, mu, sigma = p

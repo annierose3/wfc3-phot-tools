@@ -1,25 +1,41 @@
+"""
+    This module contains utilities for performing aperture
+    photometry for staring mode observations.
+
+    Author
+    ------
+    Clare Shanahan, Dec 2019
+
+    To-Do
+    -----
+    - Figure out if query_simbad... needs return like (c)
+
+"""
+
 import astropy.units as u
 from astropy.coordinates import SkyCoord
-from astropy.time import Time
 from astropy.io import fits
+from astropy.time import Time
 import numpy as np
-
 
 def query_simbad_by_targname(targname):
 
-    """Querys SIMBAD for `targname`, and constructs a
-    `astropy.coordinates.SkyCoord` object containing the RA, Dec, proper
-    motion, radial velocity, and distance to the object.
+    """
+    Queries SIMBAD for `targname`, and constructs a
+    `astropy.coordinates.SkyCoord` object containing the
+    RA, Dec, proper motion, radial velocity, and distance
+    to the object.
 
     Paramters
     ---------
-        targname : str
-            Target name. Simbad is queried by target name.
+    targname : str
+        Target name. Simbad is queried by target name.
+
     Returns
     -------
-        c : `astropy.coordinates.SkyCoord`
-            SkyCoord object with query results.
-        """
+    c : `astropy.coordinates.SkyCoord`
+        SkyCoord object with query results.
+    """
 
     from astroquery.simbad import Simbad
 
@@ -46,22 +62,25 @@ def query_simbad_by_targname(targname):
 
 def apply_proper_motion_targ(targname, mjd):
 
-    """Querys Simbad for ra, dec, and proper motions for 'targname'.
-       Returns (RA, and Dec) at date `mjd` considering the proper motion.
+    """
+    Queries Simbad for ra, dec, and proper motions for
+    'targname'. Returns (RA, and Dec) at date `mjd`
+    considering the proper motion.
 
-        Parameters
-        ---------
-        targname : str
-            Target name. Simbad is queried by target name.
-        mjd : float
-            MJD for which to calculate RA, and Dec.
+    Parameters
+    ---------
+    targname : str
+        Target name. Simbad is queried by target name.
+    mjd : float
+        MJD for which to calculate RA, and Dec.
 
-        Returns
-        -------
-        (ra_new, dec_new) : tuple of floats
-            RA and Dec for `targname` after applying proper motion. In degrees.
+    Returns
+    -------
+    (ra_new, dec_new) : tuple of floats
+        RA and Dec for `targname` after applying proper
+        motion. In degrees.
 
-            """
+    """
 
     c = query_simbad_by_targname(targname)
 
