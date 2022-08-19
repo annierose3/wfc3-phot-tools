@@ -1,22 +1,45 @@
-import numpy as np 
+"""
+    This module contains a function to calculate flux
+    errors in the same manner as IRAF/DAOPHOT.
 
+    Authors
+    -------
+    Mariarosa Marinelli, 2022
+    Clare Shanahan, Dec 2019
+
+    Use
+    ---
+        This script is intended to imported.
+
+"""
+
+import numpy as np
 
 def compute_phot_err_daophot(flux, back, back_rms, phot_ap_area,
                              sky_ap_area, gain=1.0):
 
-    """Calculates flux errors in the same manner as IRAF/DAOphot.
+    """
+    Calculates flux errors in the same manner as
+    IRAF/DAOphot.
 
-    The error terms in this model represent Poisson noise from the source,
-    Poisson noise in the sky and readout noise, and error in the sky
-    measurement
-    err = sqrt((flux - back*phot_ap_area)/epadu + phot_ap_area * backrms**2 +
-    phot_ap_area**2 * backrms**2 / sky_ap_area)
-    Where flux is the aperture sum, back is the per-pixel background level,
-    epadu is the conversion factor between e- and adu (gain), phot_ap_area is
-    the area of the photometric aperture, backrms is the uncertainty in the
-    sky, and sky_ap_area is the sky aperture area. Note that the
-    flux/background in the above equation are in ADU, but the input to this
-    function is in e-. The conversion is done internally.
+    The error terms in this model represent Poisson noise
+    from the source, Poisson noise in the sky and readout
+    noise, and error in the sky measurement.
+
+        err = sqrt(
+                   (flux - back*phot_ap_area)/epadu +
+                   phot_ap_area * backrms**2 +
+                   phot_ap_area**2 * backrms**2 / sky_ap_area
+                   )
+
+    Where flux is the aperture sum, back is the per-pixel
+    background level, epadu is the conversion factor
+    between e- and adu (gain), phot_ap_area is the area of
+    the photometric aperture, backrms is the uncertainty in
+    the sky, and sky_ap_area is the sky aperture area. Note
+    that the flux/background in the above equation are in
+    ADU, but the input to this function is in e-. The
+    conversion is done internally.
 
     Parameters
     ----------
@@ -36,7 +59,7 @@ def compute_phot_err_daophot(flux, back, back_rms, phot_ap_area,
      Returns
      --------
      errs : tuple
-        (error in insturmental magnitudes, error in flux)
+        (error in instrumental magnitudes, error in flux)
     """
 
     # convert values input in e- to ADU, as equation expects
