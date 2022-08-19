@@ -1,41 +1,51 @@
-from astroquery.mast import Observations
-from astropy.table import Table, vstack
-import glob
-import os
-import shutil
-
 """
-    Functions to search for and download WFC3 data from MAST using Astroquery.
+    Functions to search for and download WFC3 data from
+    MAST using Astroquery.
 
     Authors
     -------
+    Mariarosa Marinelli, 2022
     Clare Shanahan, Oct 2019
-"""
 
+    Notes
+    -----
+    Data should be public access for calibration, but
+    proprietary data will need access authentication.
+
+"""
+import os
+import glob
+import shutil
+from astroquery.mast import Observations
+from astropy.table import Table, vstack
 
 def query_by_propid_targ_filter(prop_ids, target_names='any', filters='any',
                                 file_types='any'):
 
-    """ Astroquery query for data from `instrument` by target name, filter,
-    and proposal ID. Returns table of data products of file type(s) in
-    `file_type`.
+    """
+    Astroquery query for data from `instrument` by
+    target name, filter, and proposal ID. Returns table of
+    data products of file type(s) in `file_type`.
 
     Parameters
     ----------
     prop_ids : str or list of str
         Proposal ID(s)
     target_names : str list of str
-        Exact target names that should be returned in query, others
-        will be excluded. All spelling/name variations that might appear in
-        MAST should be provided. If 'any', all available targets will be
+        Exact target names that should be returned in
+        query, others will be excluded. All spelling/name
+        variations that might appear in MAST should be
+        provided. If 'any', all available targets will be
         returned.
-    filters: str of list of str.
-        Filters that should be returned in query, other will be excluded. If
-        'any', all available filters will be returned.
-    file_types : str or list or
-        File extention type(s) desired (i.e flt, flc, drz...), as a string for
-        a single type or a list for many. If 'any', all available file types
+    filters: str or list of str
+        Filters that should be returned in query; others
+        will be excluded. If 'any', all available filters
         will be returned.
+    file_types : str or list of str
+        File extention type(s) desired (i.e flt, flc,
+        drz...), as a string for a single type or a list
+        for many. If 'any', all available file types will
+        be returned.
 
     Returns
     --------
@@ -91,10 +101,22 @@ def query_by_propid_targ_filter(prop_ids, target_names='any', filters='any',
 
 def query_by_data_id(dataset_ids, file_type):
 
-    """ Astroquery query by file rootname(s) or ASN ID. Query will return
-        all records found for IDs in `dataset_ids` list (or string if
-        single ID) of type `file_type`. `file_type` can be set to a string
-        ('FLT'), a list of strings (['FLT', DRZ']), or 'any'."""
+    """
+    Astroquery query by file rootname(s) or ASN ID. Query
+    will return all records found for IDs in `dataset_ids`
+    list (or string if single ID) of type `file_type`.
+    `file_type` can be set to a string ('FLT'), a list of
+    strings (['FLT', DRZ']), or 'any'.
+
+    Parameters
+    ----------
+    dataset_ids :
+    file_type :
+
+    Returns
+    -------
+    query_products_total :
+    """
 
     # initial query for all files in visit, since you can only query by ASN ID
     # and `dataset_ids might contain single exposure rootnames
@@ -138,19 +160,23 @@ def query_by_data_id(dataset_ids, file_type):
 
 def download_products(query_products, output_dir=''):
 
-    """ Downloads all products in `query_products` to `output_dir`.
+    """
+    Downloads all products in `query_products` to
+    `output_dir`.
 
     Parameters
     ----------
     query_products : `astropy.table.Table`
         Table of data products to download.
 
-
     Notes
     -----
-    Files are initially downladed temporary directory within `output_dir`
-    called 'temp', so if a subdirectory `temp` already exists within
-    `output_dir` an error is raised. ."""
+        Files are initially downladed temporary directory
+        within `output_dir` called 'temp', so if a
+        subdirectory `temp` already exists within
+        `output_dir`, an error is raised.
+
+    """
 
     # format path for output dir
     if output_dir == '':
