@@ -216,10 +216,8 @@ def _fill_nan_interp(im_arr):
         print(c)
         row = trans_im_arr[c]  # this doesn't do anything really
         if np.isnan(row[0]):
-            print(f'first if: {row[~np.isnan(row)][0]}')
             row[0] = row[~np.isnan(row)][0]
         if np.isnan(row[-1]):
-            print(f'second if: {~np.isnan(row)[-1]}')
             row[-1] = row[~np.isnan(row)][-1]
         trans_im_arr[c] = pd.Series(row).interpolate()
     return trans_im_arr.T
