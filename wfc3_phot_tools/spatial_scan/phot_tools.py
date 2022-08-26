@@ -9,11 +9,14 @@
 
 """
 
+print('version2')
+
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.convolution import Gaussian2DKernel
-from astropy.stats import gaussian_fwhm_to_sigma, sigma_clipped_stats
+from astropy.stats import gaussian_fwhm_to_sigma
+from scipy.stats import sigmaclip
 from photutils import (detect_sources, detect_threshold, source_properties,
                        RectangularAperture, aperture_photometry)
 
@@ -136,19 +139,39 @@ def calc_sky(data, x_pos, y_pos, source_mask_len, source_mask_width, n_pix,
      """
     temp_data = copy.deepcopy(data)
 
-    # mask rect. aperture around source, to exclude these pix in sky calc.
-    temp_data[int(y_pos-(source_mask_len/2.)):int(y_pos+(source_mask_len/2.)),
-              int(x_pos-(source_mask_width/2.)):
-              int(x_pos+(source_mask_width/2.))] = np.nan
+    ap_y = source_mask_len/2.
+    ap_x = source_mask_width/2.
 
+    # mask rect. aperture around source, to exclude these pix in sky calc.
+    temp_data[int(y_pos-ap_y):int(y_pos+ap_y),
+              int(x_pos-ap_x):int(x_pos+ap_x)] = np.nan
+
+    # mask outside of 30 pixel rind:
+
+    # mask left and bottom:
+    x_l = int(x_pos-ap_x-30)
+    y_b = int(y_pos-ap_y-30)
+
+    temp_data[:, :x_l] = np.nan
+    temp_data[:y_b, :] = np.nan
+
+    # mask right and top:
+    x_r = int(x_pos+ap_x+30)
+    y_t = int(y_pos+ap_y+30)
+
+    temp_data[:, x_r:] = np.nan
+    temp_data[y_t:, :] = np.nan
+
+    # flatten data to run stats:
     flat_dat = temp_data.flatten()
 
     flat_masked_dat = flat_dat[~np.isnan(flat_dat)]
-    mean, median, backrms = sigma_clipped_stats(flat_masked_dat)
+    clipped, low, upp = sigmaclip(flat_masked_dat)
+    backrms = np.std(clipped)
     if method == 'median':
-        back = median
+        back = np.median(clipped)
     if method == 'mean':
-        back = mean
+        back = np.mean(clipped)
 
     return back, backrms
 
@@ -186,7 +209,7 @@ def aperture_photometry_scan(data, x_pos, y_pos, ap_width, ap_length,
     Returns
     -------
     phot_tab : `astropy.table`
-        Table containing ?
+        Table containing photometric sum.
     """
 
     copy_data = copy.copy(data)
