@@ -1,0 +1,13 @@
+name: wfc3_phot_tools
+channels:
+- astropy
+- conda-forge
+dependencies:
+- astropy=5.0
+- python=3.8
+- numpy=1.22.1
+- matplotlib=3.1
+- pandas=1.4.3
+- photutils=1.5.0
+- astroquery=0.4
+- scipy=1.6
