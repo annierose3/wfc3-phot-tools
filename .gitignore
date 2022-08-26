@@ -8,6 +8,8 @@
 /wfc3_phot_tools/._spatial_scan
 /wfc3_phot_tools/._staring_mode
 /wfc3_phot_tools/._utils
+/tests
+/wfc3_phot_tools/*/.__pycache__
 
 # Do not track files of these types:
 .DS_Store
