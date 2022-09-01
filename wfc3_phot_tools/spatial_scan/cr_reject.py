@@ -6,12 +6,14 @@
 
     Authors
     -------
-        Mariarosa Marinelli, Jan 2022
+        Mariarosa Marinelli, 2022
         Clare Shanahan, May 2018
 
     Use
     ---
-        This script is intended to be imported.
+        This script is intended to be imported:
+
+            from wfc3_phot_tools.spatial_scan import cr_reject
 
     Notes
     -----
@@ -213,7 +215,6 @@ def _fill_nan_interp(im_arr):
     trans_im_arr = im_arr.T
 
     for c in range(0, im_arr.shape[1]):
-        print(c)
         row = trans_im_arr[c]  # this doesn't do anything really
         if np.isnan(row[0]):
             row[0] = row[~np.isnan(row)][0]
@@ -290,8 +291,6 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
         Tuple of 2D arrays containing the repaired data,
         and mask, respectivley.
     """
-    print('New version imported.')
-
     data = copy.copy(data)
 
     if scan_orient == 'H':
