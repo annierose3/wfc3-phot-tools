@@ -12,10 +12,11 @@
 
 """
 
-import astropy.units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.time import Time
+import astropy.units as u
+from astroquery.simbad import Simbad
 import numpy as np
 
 def query_simbad_by_targname(targname):
@@ -36,8 +37,6 @@ def query_simbad_by_targname(targname):
     c : `astropy.coordinates.SkyCoord`
         SkyCoord object with query results.
     """
-
-    from astroquery.simbad import Simbad
 
     customSimbad = Simbad()
     customSimbad.add_votable_fields('pmra', 'pmdec', 'distance', 'rv_value')
