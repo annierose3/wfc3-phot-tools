@@ -4,12 +4,18 @@
 
     Authors
     -------
-    Mariarosa Marinelli, 2022
-    Clare Shanahan, Dec 2019
+        Mariarosa Marinelli, 2022
+        Clare Shanahan, Dec 2019
 
     Use
     ---
-        This script is intended to imported.
+        This script is intended to imported:
+
+            from wfc3_phot_tools.utils import daophot_err
+
+        or:
+
+            from wfc3_phot_tools.utils.daophot_err import compute_phot_err_daophot
 
 """
 

@@ -4,12 +4,16 @@
 
     Authors
     -------
-    Mariarosa Marinelli, June 2022
-    Clare Shanahan, Dec 2019
+        Mariarosa Marinelli, June 2022
+        Clare Shanahan, Dec 2019
+
+    Use
+    ---
+        This script is intended to imported:
+
+            from wfc3_phot_tools.spatial_scan import phot_tools
 
 """
-
-print('version2')
 
 import copy
 import numpy as np

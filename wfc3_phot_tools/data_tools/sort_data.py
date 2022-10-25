@@ -1,13 +1,9 @@
 """
-    Functions to sort data.
+    This module contains functions to sort data.
 
     Authors
     -------
-    Mariarosa Marinelli, 2022
-    Clare Shanahan, Oct 2019
-
-    Notes
-    -----
+        Clare Shanahan, Oct 2019
 
 """
 

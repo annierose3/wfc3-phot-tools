@@ -16,18 +16,20 @@
             WFC3 Instrument Science Report 2017-07
             Deustua et al.
 
-    Author
-    ------
-    Clare Shanahan, Dec 2019
-    Mariarosa Marinelli, 2022
+    Authors
+    -------
+        Clare Shanahan, Dec 2019
+        Mariarosa Marinelli, 2022
 
     Use
     ---
-        This script is intended to imported.
+        This script is intended to imported:
 
-    To-Do
-    -----
-    - Add PAM maps to github repo
+            from wfc3_phot_tools.utils import UVIS_PAM
+
+        or:
+
+            from wfc3_phot_tools.utils.UVIS_PAM import make_PAMcorr_image_UVIS
 
 """
 

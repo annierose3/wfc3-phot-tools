@@ -1,6 +1,6 @@
 """
-    Tools for computing background statistics within
-    photutils apertures.
+    This module contains functions for computing background
+    statistics within `photutils` apertures.
 
     Authors
     -------

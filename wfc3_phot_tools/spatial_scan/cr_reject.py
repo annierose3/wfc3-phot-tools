@@ -1,8 +1,10 @@
 """
-    Contains functions for identifying and reparing CR hits
-    in spatially scanned data. Optimized for WFC3/UVIS
-    scans that are nearly vertical or horizontal. Adapted
-    from an IDL routine by S. Casertano for STIS.
+    This module contains functions for identifying and
+    reparing CR hits in spatially scanned data. Optimized
+    for WFC3/UVIS scans that are nearly vertical or
+    horizontal.
+
+    Adapted from an IDL routine by S. Casertano for STIS.
 
     Authors
     -------

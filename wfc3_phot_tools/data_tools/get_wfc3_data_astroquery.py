@@ -1,16 +1,16 @@
 """
-    Functions to search for and download WFC3 data from
-    MAST using Astroquery.
+    This module contains functions to search for and
+    download WFC3 data from MAST using Astroquery.
 
     Authors
     -------
-    Mariarosa Marinelli, 2022
-    Clare Shanahan, Oct 2019
+        Mariarosa Marinelli, 2022
+        Clare Shanahan, Oct 2019
 
     Notes
     -----
-    Data should be public access for calibration, but
-    proprietary data will need access authentication.
+        Data should be public access for calibration, but
+        proprietary data will need access authentication.
 
 """
 import os
