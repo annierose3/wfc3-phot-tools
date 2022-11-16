@@ -1,13 +1,15 @@
 # Do not track files in these directories
 /build
 /dist
-/WFC3_phot_tools.egg-info
-/WFC3_phot_tools/.___init__.py
-/WFC3_phot_tools/.___pycache__
-/WFC3_phot_tools/._data_tools
-/WFC3_phot_tools/._spatial_scan
-/WFC3_phot_tools/._staring_mode
-/WFC3_phot_tools/._utils
+/wfc3_phot_tools.egg-info
+/wfc3_phot_tools/.___init__.py
+/wfc3_phot_tools/.___pycache__
+/wfc3_phot_tools/._data_tools
+/wfc3_phot_tools/._spatial_scan
+/wfc3_phot_tools/._staring_mode
+/wfc3_phot_tools/._utils
+/tests
+/wfc3_phot_tools/*/.__pycache__
 
 # Do not track files of these types:
 .DS_Store
