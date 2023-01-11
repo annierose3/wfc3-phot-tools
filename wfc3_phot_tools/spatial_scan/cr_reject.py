@@ -13,7 +13,7 @@
 
     Use
     ---
-        This script is intended to be imported:
+    This script is intended to be imported:
 
             from wfc3_phot_tools.spatial_scan import cr_reject
 
@@ -75,11 +75,11 @@ def unmask_isolated_pixels(data):
 
     Notes
     -----
-        To account for endian weirdness of input data, this
-        function begin with adding a float zero to the data
+    To account for endian weirdness of input data, this
+    function begin with adding a float zero to the data
 
-        See documentation of this issue at:
-            https://github.com/astropy/astropy/issues/1156
+    See documentation of this issue at:
+        https://github.com/astropy/astropy/issues/1156
 
     """
     array = data + 0.
@@ -197,12 +197,6 @@ def _fill_nan_interp(im_arr):
     Helper function to interpolate data with NaNs, used to
     replace CR hits with surrounding 'good' pixels.
 
-    Notes
-    -----
-        Currently does not handle top 10/bottom 10 rows as
-        intended. Has trouble at the edges of the detector
-        (ex. the top of the Amp A 512x512 subarray).
-
     Parameters
     ----------
     im_arr : `numpy.ndarray`
@@ -212,6 +206,12 @@ def _fill_nan_interp(im_arr):
     -------
     trans_im_arr.T : `numpy.ndarray`
         2D array of input data, with interpolated values.
+
+    Notes
+    -----
+    Currently does not handle top 10/bottom 10 rows as
+    intended. Has trouble at the edges of the detector
+    (ex. the top of the Amp A 512x512 subarray).
 
     """
     trans_im_arr = im_arr.T
@@ -231,22 +231,31 @@ def _determine_scan_orientation_wfc3(hdr):
     Helper function that uses 'SCAN_ANG' header keyword to
     determine if scan is vertical or horizontal.
 
-    Notes
-    -----
-        Verify that the hdr is always the data/science header.
-
-    Parameters
-    ----------
+    Parameter
+    ---------
     hdr :
         Header of the fits file data extension for the file
-        being processed.
+        being processed
+
+    Returns
+    -------
+    scan_orient : string
+        Scan orientation, either 'H' for horizontal or 'V'
+        for vertical.
+
+    Notes
+    -----
+    Verify that the hdr is always the data/science header.
+
     """
 
     scan_ang = hdr['SCAN_ANG']
     if np.abs(scan_ang - 138.5) < 5:
-        return 'H'
+        scan_orient = 'H'
     else:
-        return 'V'
+        scan_orient = 'V'
+
+    return scan_orient
 
 
 def mask_and_repair_flagged_pixels(data, scan_orient, mult):
@@ -272,14 +281,6 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
     interpolation of the 2 nearest surrounding 'good' pixels
     above or below, in the direction of the scan.
 
-    Notes
-    -----
-        For one particular scan, this function triggered a
-        critical failure during the processing of the
-        tails of the scan and I'm still unsure why.
-
-        idx5a8s6q is the scan rootname.
-
     Parameters
     ----------
     data : `numpy.ndarray`
@@ -292,13 +293,22 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
     (corrected_data, mask) : Tuple of 'numpy.ndarray'
         Tuple of 2D arrays containing the repaired data,
         and mask, respectivley.
+
+    Notes
+    -----
+    For one particular scan, this function triggered a
+    critical failure during the processing of the
+    tails of the scan and I'm still unsure why.
+
+    idx5a8s6q is the scan rootname.
+
     """
     data = copy.copy(data)
 
     if scan_orient == 'H':
         data = data.T
 
-    # pass #1
+    ###### start pass 1
     mask = 1.*make_cr_mask(data, mult)
 
     # remove isolated pixels from mask
@@ -308,6 +318,8 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
     k = np.where(mask > 0)
     data[k] = np.nan
     data = _fill_nan_interp(data)
+
+    ##### end pass 1
 
     # pass #2
     # process the ends of the trails differently than the rest
