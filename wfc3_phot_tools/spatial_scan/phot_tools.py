@@ -9,7 +9,7 @@
 
     Use
     ---
-        This script is intended to imported:
+        This script is intended to be imported:
 
             from wfc3_phot_tools.spatial_scan import phot_tools
 
@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
 from scipy.stats import sigmaclip
-from photutils import (detect_sources, detect_threshold, source_properties,
+from photutils import (detect_sources, detect_threshold, segmentation,
                        RectangularAperture, aperture_photometry)
 
 def detect_sources_scan(data, snr_threshold=3.0, sigma_kernel=3,
@@ -88,7 +88,7 @@ def detect_sources_scan(data, snr_threshold=3.0, sigma_kernel=3,
     segm = detect_sources(data, threshold, npixels=n_pixels,
                           filter_kernel=kernel)
 
-    props = source_properties(data, segm)
+    props = segmentation.SourceCatalog(data, segm)
     properties_tbl = props.to_table()
 
     if show:
