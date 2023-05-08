@@ -70,15 +70,15 @@ def compute_phot_err_daophot(flux, back, back_rms, phot_ap_area,
 
     # convert values input in e- to ADU, as equation expects
     # sky subtract flux to isolate poisson noise from source
-    flux = (flux - back*phot_ap_area) / gain
-    back = back / gain
-    back_rms = back_rms / gain
+    flux = (flux - back*phot_ap_area) / gain                # ADU
+    back = back / gain                                      # ADU / px^2      # we don't use this anywhere???
+    back_rms = back_rms / gain                              # ADU / px^2
 
-    err1 = (flux/gain)
-    err2 = (phot_ap_area*back_rms**2)
-    err3 = (phot_ap_area**2 * back_rms**2) / sky_ap_area
+    err1 = (flux/gain)                                      # ADU^2 / e
+    err2 = (phot_ap_area*back_rms**2)                       # ADU^2
+    err3 = (phot_ap_area**2 * back_rms**2) / sky_ap_area    # ADU^2 / px^2
 
-    flux_err_adu = np.sqrt(np.abs(err1 + err2 + err3))  # in ADU
-    flux_err = flux_err_adu * gain
+    flux_err_adu = np.sqrt(np.abs(err1 + err2 + err3))      # ADU * np.sqrt(np.abs(1+1/e+1/px^2))
+    flux_err = flux_err_adu * gain                          # e
 
     return flux_err
