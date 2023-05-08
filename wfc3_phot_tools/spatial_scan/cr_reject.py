@@ -56,6 +56,10 @@ from scipy.ndimage import generate_binary_structure, label
 from scipy.ndimage.measurements import find_objects
 from scipy.signal import medfilt
 
+import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+
+
 def unmask_isolated_pixels(data):
     """
     Helper function to remove the CR mask for isolated
@@ -324,6 +328,7 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
     # pass #2
     # process the ends of the trails differently than the rest
 
+    rolled_data = np.roll(data, 1, 0)
     gr = data - np.roll(data, 1, 0)
 
     gr_min = np.nanmin(gr.flatten())
@@ -344,22 +349,41 @@ def mask_and_repair_flagged_pixels(data, scan_orient, mult):
 
     # the following for-loop caused a critical error for
     # one scan, and I'm still not sure why. -MM
-    for j in range(min([k_min[1], k_max[1]])[0] - 3,
-                   max([k_min[1], k_max[1]])[0] + 3 + 1):
 
-        v = data[:, j]
+    range_low = min([k_min[1], k_max[1]])[0] - 3
+    range_high = max([k_min[1], k_max[1]])[0] + 3 + 1
 
-        mv = medfilt(v, 5)
-        v_mv = v - mv
-        sig = np.nanstd(v_mv)
+    if range_low < 0:
+        range_low = 0
 
-        k = (np.where(v_mv > (mult * sig)))[0]
+    if range_high > len(data):
+        range_high = len(data)
 
-        if len(k) > 0:
-            for i, val in enumerate(k):
-                if ((np.abs(k[i] - k_min[0]) < dy) or
-                    (np.abs(k[i] - k_max[0]) < dy)):
-                    mask[k, j] = 1
+    for j in range(range_low, range_high):
+
+        try:
+            v = data[:, j]
+
+            mv = medfilt(v, 5)
+            v_mv = v - mv
+            sig = np.nanstd(v_mv)
+
+            k = (np.where(v_mv > (mult * sig)))[0]
+
+            if len(k) > 0:
+                for i, val in enumerate(k):
+                    if ((np.abs(k[i] - k_min[0]) < dy) or
+                        (np.abs(k[i] - k_max[0]) < dy)):
+                        mask[k, j] = 1
+        except IndexError:
+            fig, ax = plt.subplots(1,3,figsize=(15,5))
+            ax[0].imshow(data, origin='lower', norm=LogNorm())
+            ax[1].imshow(rolled_data, origin='lower', norm=LogNorm())
+            ax[2].imshow(gr, origin='lower')
+            plt.savefig(f'{j}.jpg', dpi=250)
+            plt.close()
+            print(f'IndexError: saved plots at {j}.jpg')
+
 
     k = np.where(mask > 0)
 
