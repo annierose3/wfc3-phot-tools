@@ -6,6 +6,13 @@ Authors
 -------
     Clare Shanahan, December 2019
     Mariarosa Marinelli, April 2023
+
+Functions
+---------
+apply_proper_motion_targ(targname, mjd)
+    Apply PM to RA/Dec of target.
+query_simbad_by_targname(targname)
+    Construct `SkyCoord` using SIMBAD query of target.
 """
 
 import astropy.units as u
@@ -14,6 +21,36 @@ from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.time import Time
 from astroquery.simbad import Simbad
+
+
+def apply_proper_motion_targ(targname, mjd):
+    """Apply PM to RA/Dec of target.
+
+    Queries Simbad for ra, dec, and proper motions for
+    'targname'. Returns (RA, and Dec) at date `mjd`
+    considering the proper motion.
+
+    Parameters
+    ---------
+    targname : str
+        Target name. Simbad is queried by target name.
+    mjd : float
+        MJD for which to calculate RA, and Dec.
+
+    Returns
+    -------
+    (ra_new, dec_new) : tuple of floats
+        RA and Dec for `targname` after applying proper
+        motion. In degrees.
+    """
+    c = query_simbad_by_targname(targname)
+
+    delta_t_yr = (mjd - 51544) / 365. * u.yr
+    ra_new = c.ra.deg * u.deg + (c.pm_ra_cosdec * delta_t_yr)
+    dec_new = c.dec.deg * u.deg + (c.pm_dec * delta_t_yr)
+
+    return ra_new.value, dec_new.value
+
 
 def query_simbad_by_targname(targname):
     """Construct `SkyCoord` using SIMBAD query of target.
@@ -53,32 +90,3 @@ def query_simbad_by_targname(targname):
                  pm_dec=pm_dec)
 
     return c
-
-
-def apply_proper_motion_targ(targname, mjd):
-    """Apply PM to RA/Dec of target.
-
-    Queries Simbad for ra, dec, and proper motions for
-    'targname'. Returns (RA, and Dec) at date `mjd`
-    considering the proper motion.
-
-    Parameters
-    ---------
-    targname : str
-        Target name. Simbad is queried by target name.
-    mjd : float
-        MJD for which to calculate RA, and Dec.
-
-    Returns
-    -------
-    (ra_new, dec_new) : tuple of floats
-        RA and Dec for `targname` after applying proper
-        motion. In degrees.
-    """
-    c = query_simbad_by_targname(targname)
-
-    delta_t_yr = (mjd - 51544) / 365. * u.yr
-    ra_new = c.ra.deg * u.deg + (c.pm_ra_cosdec * delta_t_yr)
-    dec_new = c.dec.deg * u.deg + (c.pm_dec * delta_t_yr)
-
-    return ra_new.value, dec_new.value

@@ -1,16 +1,22 @@
 """
-    This module contains functions to search for and
-    download WFC3 data from MAST using Astroquery.
+This module contains functions to search for and
+download WFC3 data from MAST using Astroquery.
 
-    Authors
-    -------
-        Mariarosa Marinelli, 2022
-        Clare Shanahan, Oct 2019
+Authors
+-------
+    Mariarosa Marinelli, 2022-2023
+    Clare Shanahan, Oct 2019
 
-    Notes
-    -----
-        Data should be public access for calibration, but
-        proprietary data will need access authentication.
+Notes
+-----
+    Data should be public access for calibration, but
+    proprietary data will need access authentication.
+
+Functions
+---------
+download_products(query_products, output_dir)
+query_by_data_id(dataset_ids, file_type)
+query_by_propid_targ_filter(prop_ids, target_names, filters, file_types)
 
 """
 import os
@@ -19,13 +25,72 @@ import shutil
 from astroquery.mast import Observations
 from astropy.table import Table, vstack
 
+
+def download_products(query_products, output_dir=os.getcwd()):
+    """
+    Downloads all products in `query_products` to
+    `output_dir`.
+
+    Parameters
+    ----------
+    query_products : `astropy.table.Table`
+        Table of data products to download.
+    output_dir : str
+        Output directory where data products should be
+        downloaded. If `output_dir` does not exist or is
+        not specified, this function will default to the
+        current working directory.
+
+    Notes
+    -----
+    Files are initially downloaded to a temporary directory
+    within `output_dir` called 'temp', so if a subdirectory
+    'temp' already exists within `output_dir`, an error is
+    raised.
+
+    Usage
+    -----
+    Implemented in WFC3/UVIS staring mode pipeline.
+    """
+    if not os.path.exists(output_dir):
+        output_dir = os.getcwd()
+
+    temp_dir = os.path.join(output_dir, 'temp')
+
+    if os.path.exists(temp_dir):
+        raise Exception("'temp' directory already exists in `output_dir`: "\
+                        f"{output_dir}")
+
+    else:
+        os.makedirs(temp_dir)
+        print(f'Created temporary directory at: {temp_dir}')
+
+    print(f'Downloading {len(query_products)} files.')
+    Observations.download_products(query_products,
+                                   download_dir=temp_dir,
+                                   mrp_only=False)
+
+    # move files from MAST download directories in `temp` to `output_dir`
+    files = glob.glob(output_dir + 'temp/mastDownload/HST/*/*.fits')
+    if len(files) > 0:
+        print("Cleaning up 'temp' directory.")
+        for f in files:
+            shutil.copy(f, output_dir+os.path.basename(f))
+
+        # remove temp directory
+        shutil.rmtree(temp_dir)
+
+
 def query_by_propid_targ_filter(prop_ids, target_names='any', filters='any',
                                 file_types='any'):
+    """Query MAST by program, target, and filter.
 
-    """
-    Astroquery query for data from `instrument` by
-    target name, filter, and proposal ID. Returns table of
-    data products of file type(s) in `file_type`.
+    This function uses Astroquery to query MAST for HST
+    data from one or more specified program. Additional
+    options include filtering on target names, detector
+    filters, and file types. Returns a table of details for
+    data products that are available to download through
+    MAST.
 
     Parameters
     ----------
@@ -52,8 +117,10 @@ def query_by_propid_targ_filter(prop_ids, target_names='any', filters='any',
     query_products : `astropy.table.Table`
         Table of products returned from query.
 
+    Usage
+    -----
+    Implemented in WFC3/UVIS staring mode pipeline.
     """
-
     if type(prop_ids) != list:
         prop_ids = [prop_ids]
     if target_names == 'any':
@@ -61,7 +128,7 @@ def query_by_propid_targ_filter(prop_ids, target_names='any', filters='any',
     if filters == 'any':
         filters = '*'
 
-    query_products = Table()
+    query_products_total = Table()
     j = 0
     for i, prop_id in enumerate(prop_ids):  # iterate to avoid timeout
         print('Querying for data from {}.'.format(prop_id))
@@ -100,26 +167,37 @@ def query_by_propid_targ_filter(prop_ids, target_names='any', filters='any',
 
 
 def query_by_data_id(dataset_ids, file_type):
+    """Query MAST by file rootnames/ASN ID.
 
-    """
-    Astroquery query by file rootname(s) or ASN ID. Query
-    will return all records found for IDs in `dataset_ids`
-    list (or string if single ID) of type `file_type`.
-    `file_type` can be set to a string ('FLT'), a list of
-    strings (['FLT', DRZ']), or 'any'.
+    This function uses Astroquery to query MAST for HST
+    data matching one or more rootnames/ASN IDs. As an
+    additional option, file types can be specified to limit
+    what is returned by the query. Returns a table of
+    details for data products available to download through
+    MAST that match IDs in `dataset_ids`.
 
     Parameters
     ----------
-    dataset_ids :
-    file_type :
+    dataset_ids : str or list of str
+        The dataset ID or IDs for which to query.
+    file_type : str or list of str
+        Type of files (ex. 'FLT', 'DRC') to be returned by
+        the MAST query.
 
     Returns
     -------
-    query_products_total :
-    """
+    query_products_total : `Astropy.table.Table`
+        Table of all data products matching given query
+        parameters.
 
-    # initial query for all files in visit, since you can only query by ASN ID
-    # and `dataset_ids might contain single exposure rootnames
+    Notes
+    -----
+    Does not appear to be implemented in any of the WFC3
+    photometry monitoring pipelines. Deprecate?
+    """
+    # Initial query for all files in visit, since you can
+    # only query by ASN ID and `dataset_ids` might contain
+    # single exposure rootnames
     if type(dataset_ids) == str:
         visit_ids = [dataset_ids[0:6] + '*']
     if type(dataset_ids) == list:
@@ -147,7 +225,8 @@ def query_by_data_id(dataset_ids, file_type):
             query_products_total = vstack([query_products,
                                            query_products_total])
 
-    # Initially all visit files were returned. Now select only specified IDs
+    # Initially all visit files were returned. Now select
+    # only specified IDs.
     remove_rows = []
     for i, obs_id in enumerate(query_products_total['obs_id']):
         if obs_id not in dataset_ids:
@@ -156,49 +235,3 @@ def query_by_data_id(dataset_ids, file_type):
 
     print('{} records found'.format(len(query_products_total)))
     return query_products_total
-
-
-def download_products(query_products, output_dir=''):
-
-    """
-    Downloads all products in `query_products` to
-    `output_dir`.
-
-    Parameters
-    ----------
-    query_products : `astropy.table.Table`
-        Table of data products to download.
-
-    Notes
-    -----
-        Files are initially downladed temporary directory
-        within `output_dir` called 'temp', so if a
-        subdirectory `temp` already exists within
-        `output_dir`, an error is raised.
-
-    """
-
-    # format path for output dir
-    if output_dir == '':
-        output_dir = os.getcwd()
-    output_dir = os.path.join(output_dir, '')
-
-    # make temp dir in `output_dir`. error if it exists.
-    print(output_dir + 'temp')
-    assert(os.path.isdir(output_dir + 'temp') is False)
-    os.makedirs(output_dir + 'temp')
-
-    print('Downloading {} files.'.format(len(query_products)))
-    Observations.download_products(query_products,
-                                   download_dir=output_dir+'temp',
-                                   mrp_only=False)
-
-    # move files from mast download directories in `temp` to `output_dir`
-    files = glob.glob(output_dir + 'temp/mastDownload/HST/*/*.fits')
-    if len(files) > 0:
-        print('Cleaning up temp directory.')
-        for f in files:
-            shutil.copy(f, output_dir+os.path.basename(f))
-
-        # remove temp directory
-        shutil.rmtree(output_dir + 'temp')  # remove mast download dir
