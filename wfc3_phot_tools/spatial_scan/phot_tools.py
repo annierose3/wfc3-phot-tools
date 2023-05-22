@@ -4,7 +4,7 @@ detection and aperture photometry on spatial scan data.
 
 Authors
 -------
-    Mariarosa Marinelli, June 2022; May 2023
+    Mariarosa Marinelli, 2022-2023
     Clare Shanahan, Dec 2019
 
 Usage
