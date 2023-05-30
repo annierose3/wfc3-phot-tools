@@ -1,22 +1,22 @@
 """
-    This module contains a function to calculate flux
-    errors in the same manner as IRAF/DAOPHOT.
+This module contains a function to calculate flux errors in
+the same manner as IRAF/DAOPHOT for spatial scans.
 
-    Authors
-    -------
-        Mariarosa Marinelli, 2022
-        Clare Shanahan, Dec 2019
+Authors
+-------
+    Mariarosa Marinelli, 2022
+    Clare Shanahan, Dec 2019
 
-    Use
-    ---
-        This script is intended to imported:
+Use
+---
+    This script is intended to be imported:
 
-            from wfc3_phot_tools.utils import daophot_err
+        from wfc3_phot_tools.utils import daophot_err
 
-        or:
+    or:
 
-            from wfc3_phot_tools.utils.daophot_err import compute_phot_err_daophot
-
+        from wfc3_phot_tools.utils.daophot_err \
+            import compute_phot_err_daophot
 """
 
 import numpy as np
