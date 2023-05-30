@@ -1,17 +1,59 @@
 # wfc3-phot-tools
 
-This Python library contains tools originally developed for WFC3/UVIS photometric calibration.
+This Python library contains tools originally developed for the photometric calibration of the HST/WFC3 instrument.
+
+As of June 2023, the WFC3 Instrument Team is making this library publicly available in an effort to increase accessibility and transparency among our user base.
+
+This package is currently implemented in the IR staring mode, UVIS staring mode, and UVIS scanning mode monitoring pipelines. These monitors enable the WFC3 team to evaluate the evolving sensitivity of the WFC3/IR and WFC3/UVIS detectors.
 
 ## Installation
 
-The minimum required versions of the necessary packages (and their dependencies) can be easily installed using the YAML file included in this repository. On the command line using conda, run the following command to create an environment called `wfc3_phot_tools`.
+### 1. Cloning the `wfc3-phot-tools` repository.
 
-> conda env create -f wfc3_phot_tools.yml
+First, clone this repository and change into the newly created directory.
+
+```
+git clone https://github.com/spacetelescope/wfc3-phot-tools.git
+
+cd wfc3-phot-tools
+```
+
+### 2. Creating a new environment (optional).
+
+If desired, a new `conda` environment can be created with the necessary dependencies using the YAML file included in this repository, within which this package can be installed.
+
+To do so, run the following command on the command line to create an environment called `wfc3_phot_tools`.
+
+```
+conda env create -f wfc3_phot_tools.yml
+```
 
 Then activate the virtual environment.
 
-> conda activate wfc3_phot_tools
+```
+conda activate wfc3_phot_tools
+```
 
-Then, install this repo as a standalone package:
+Alternately, this package can be installed as a standalone package, a process that will install the minimum required versions of the package's dependencies (listed in `pyproject.toml`) into the active environment.
 
-> python setup.py install
+### 3. Installing the `wfc3_phot_tools` library.
+
+There are two ways to install this library. For most people, a static installation should suffice, as this is a stable package.
+
+```
+pip install .
+```
+
+Active developers of this package should install in "editable" mode.
+
+```
+pip install --editable .
+```
+
+## Contributors
+
+The following people have contributed to this code base:
+- Varun Bajaj
+- Mariarosa Marinelli
+- Jenny Medina
+- Clare Shanahan
