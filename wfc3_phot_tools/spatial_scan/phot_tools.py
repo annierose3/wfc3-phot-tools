@@ -30,7 +30,7 @@ import os
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm()
+from matplotlib.colors import LogNorm
 from photutils.aperture import aperture_photometry, RectangularAperture
 from photutils.segmentation import (detect_sources, detect_threshold,
                                     SourceCatalog)
