@@ -46,10 +46,14 @@ def _check_plot_filepath(filepath):
     Parameter
     ---------
     filepath : str or NoneType
+        Intended file path where plot should be saved.
 
     Returns
     -------
     filepath : str
+        Either input filepath, if it was successfully
+        verified, or a corrected filepath, where plot will
+        be saved.
     """
     cwd = os.getcwd()
     default_filename = 'image.jpg'
@@ -347,11 +351,14 @@ def isolate_sky_rind(data, x_pos, y_pos,
     Parameters
     ----------
     data : array-like
-    x_pos : int or float
-    y_pos : int or float
-    source_mask_len : int
-    source_mask_width : int
+        Input image data.
+    x_pos, y_pos, : int(s) and/or float(s)
+        Centroid x- and y-positions, in pixels.
+    source_mask_len, source_mask_width : ints
+        Length and width, respectively, of the rectangular
+        photometric aperture, in pixels.
     n_pix : int
+        Width of background sky rind, in pixels.
 
     Returns
     -------
