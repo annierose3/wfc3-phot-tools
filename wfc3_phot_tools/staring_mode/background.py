@@ -4,9 +4,20 @@ statistics within `photutils` apertures.
 
 Authors
 -------
-    Varun Bajaj, December 2017
+    Varun Bajaj, 2017-2018
     Clare Shanahan, December 2019
-    Mariarosa Marinelli, June 2022
+    Mariarosa Marinelli, 2022-2023
+
+Use
+---
+    This script is intended to be imported:
+
+        from wfc3_phot_tools.staring_mode import background
+
+    or:
+
+        from wfc3_phot_tools.staring_mode.background \
+            import make_aperture_stats_tbl
 
 Functions
 ---------
@@ -14,9 +25,9 @@ _gauss(x, *p)
     Helper function to create a Gaussian distribution.
 calc_1d_gauss_background(data, bins, hist_range)
     Fits 1D Gaussian to data and returns the coefficients.
-calc_aperture_stats(data, mask, sigma_clip) -- NEW
+calc_aperture_stats(data, mask, sigma_clip)
     Computes stats in an aperture/annulus.
-make_aperture_stats_tbl(data, apertures, method, sigma_clip) -- NEW
+make_aperture_stats_tbl(data, apertures, method, sigma_clip)
     Computes statistics in `photutils` aperture(s).
 """
 import numpy as np
@@ -26,11 +37,13 @@ from scipy.optimize import curve_fit
 from scipy.signal import find_peaks
 from scipy.stats import sigmaclip
 
+
 def _gauss(x, *p):
     """Helper function to create a Gaussian distribution.
     """
     A, mu, sigma = p
     return A*np.exp(-(x-mu)**2/(2.*sigma**2))
+
 
 def calc_1d_gauss_background(data, bins=100, hist_range=(-10, 10)):
     """Fits 1D Gaussian to data and returns the coefficients.
@@ -76,8 +89,11 @@ def calc_aperture_stats(data, mask, sigma_clip):
     Parameters
     ----------
     data : array-like
+        Input image data.
     mask : array-like
+        Mask from `photutils` apertures.
     sigma_clip : Boolean
+        Flag to activate sigma clipping of background pixels
 
     Returns
     -------
@@ -142,9 +158,9 @@ def make_aperture_stats_tbl(data, apertures, method='exact', sigma_clip=True):
     -------
     aperture_stats_tbl : astropy.table.Table
         An astropy Table with the columns 'x', 'y', 'mean',
-        'median', 'mode', 'std', 'aperture_area', and a row
-        for each of the sets of coordinates specified in
-        `apertures.positions`.
+        'median', 'mode', 'std', 'aperture_nonnan_area',
+        and a row for each of the sets of coordinates
+        specified in `apertures.positions`.
     """
     # Get the masks that will be used to identify our desired pixels.
     masks = apertures.to_mask(method=method)
@@ -158,7 +174,7 @@ def make_aperture_stats_tbl(data, apertures, method='exact', sigma_clip=True):
     aperture_stats_tbl = Table(rows=aperture_stats_rows,
                                names=('aperture_mean', 'aperture_median',
                                       'aperture_mode', 'aperture_std',
-                                      'actual_area'))
+                                      'aperture_nonnan_area'))
 
     aperture_stats_tbl['x'] = [position[0] for position in apertures.positions]
     aperture_stats_tbl['y'] = [position[1] for position in apertures.positions]
