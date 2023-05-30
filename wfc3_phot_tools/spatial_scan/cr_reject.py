@@ -20,7 +20,8 @@ Usage
     Alternately, the main function of this module can be
     imported directly:
 
-        from wfc3_phot_tools.spatial_scan.cr_reject import make_crcorr_file_scan_wfc3
+        from wfc3_phot_tools.spatial_scan.cr_reject \
+            import make_crcorr_file_scan_wfc3
 
 Notes
 -----
@@ -102,7 +103,6 @@ def _determine_scan_orientation_wfc3(pri_hdr):
     Notes
     -----
     Verify that the hdr is always the data/science header.
-
     """
 
     scan_ang = pri_hdr['SCAN_ANG']

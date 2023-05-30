@@ -27,9 +27,7 @@ from astropy.table import Table, vstack
 
 
 def download_products(query_products, output_dir=os.getcwd()):
-    """
-    Downloads all products in `query_products` to
-    `output_dir`.
+    """Download data products to `output_dir`.
 
     Parameters
     ----------

@@ -1,36 +1,36 @@
 """
-    This module contains a function to correct geometric
-    distortion in UVIS FLT (flat-fielded) images. By
-    multiplying the data from the FLT by the appropriate
-    Pixel Area Map (PAM), any given source will yield a
-    count-rate equivalent to what would have been achieved
-    by drizzling multiple FLTs together.
+This module contains a function to correct geometric
+distortion in UVIS FLT (flat-fielded) images. By
+multiplying the data from the FLT by the appropriate
+Pixel Area Map (PAM), any given source will yield a
+count-rate equivalent to what would have been achieved
+by drizzling multiple FLTs together.
 
-    For more background, see:
-        "Pixel Area Maps"
-            www.stsci.edu/hst/instrumentation/wfc3/data-analysis/pixel-area-maps
-        "WFC3 Pixel Area Maps"
-            WFC3 Instrument Science Report 2010-08
-            Kalirai et al.
-        "WFC3 Chip Dependent Photometry with the UV filters"
-            WFC3 Instrument Science Report 2017-07
-            Deustua et al.
+For more background, see:
+    "Pixel Area Maps"
+        www.stsci.edu/hst/instrumentation/wfc3/data-analysis/pixel-area-maps
+    "WFC3 Pixel Area Maps"
+        WFC3 Instrument Science Report 2010-08
+        Kalirai et al.
+    "WFC3 Chip Dependent Photometry with the UV filters"
+        WFC3 Instrument Science Report 2017-07
+        Deustua et al.
 
-    Authors
-    -------
-        Clare Shanahan, Dec 2019
-        Mariarosa Marinelli, 2022
+Authors
+-------
+    Clare Shanahan, Dec 2019
+    Mariarosa Marinelli, 2022
 
-    Use
-    ---
-        This script is intended to imported:
+Use
+---
+    This script is intended to be imported:
 
-            from wfc3_phot_tools.utils import UVIS_PAM
+        from wfc3_phot_tools.utils import UVIS_PAM
 
-        or:
+    or:
 
-            from wfc3_phot_tools.utils.UVIS_PAM import make_PAMcorr_image_UVIS
-
+        from wfc3_phot_tools.utils.UVIS_PAM \
+            import make_PAMcorr_image_UVIS
 """
 
 import copy
