@@ -11,7 +11,7 @@ version = "1.0"
 authors = [
     {name = "Mariarosa Marinelli", email = "mmarinelli@stsci.edu"},
 ]
-description = "Python tools for WFC3/UVIS photometric calibration"
+description = "Python tools for HST/WFC3 photometric calibration"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {text = "BSD-3-Clause"}
