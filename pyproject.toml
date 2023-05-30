@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.2", "setuptools_scm[toml]>=3.4"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[project]
+name = "wfc3_phot_tools"
+version = "1.0"
+authors = [
+    {name = "Mariarosa Marinelli", email = "mmarinelli@stsci.edu"},
+]
+description = "Python tools for WFC3/UVIS photometric calibration"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "BSD-3-Clause"}
+dependencies = ["astropy>=5.0", "astroquery", "ginga",
+                "matplotlib", "numpy>=1.22",
+                "pandas", "photutils>=1.5", "scipy"]
+
+[project.urls]
+repository = "https://github.com/spacetelescope/wfc3-phot-tools"
