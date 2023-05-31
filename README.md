@@ -2,7 +2,7 @@
 
 This Python library contains tools originally developed for the photometric calibration of the HST/WFC3 instrument.
 
-This package is currently implemented in the IR staring mode, UVIS staring mode, and UVIS scanning mode monitoring pipelines. These monitors enable the WFC3 team to evaluate the evolving sensitivity of the WFC3/IR and WFC3/UVIS detectors. As of June 2023, the WFC3 Instrument Team is making this library publicly available in an effort to increase accessibility and transparency among our user base.
+This package is currently implemented in the IR staring mode, UVIS staring mode, and UVIS scanning mode monitoring pipelines. These monitors enable the WFC3 Instrument Team to evaluate the evolving sensitivity of the WFC3/IR and WFC3/UVIS detectors. As of June 2023, this library is being made publicly available in an effort to increase accessibility and transparency among our user base.
 
 ## Installation
 
@@ -33,6 +33,7 @@ conda activate wfc3_phot_env
 ```
 
 Alternately, this package can be installed as a standalone package, a process that will install the minimum required versions of the package's dependencies (listed in `pyproject.toml`) into the active environment.
+
 
 ### 3. Installing the `wfc3_phot_tools` library.
 
