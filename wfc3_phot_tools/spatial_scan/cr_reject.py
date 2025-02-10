@@ -541,7 +541,7 @@ def make_crcorr_file_scan_wfc3(input_file, mult=4, output_dir=None, ext=1,
         output_dir = os.path.dirname(input_file)
 
     # Check that input file is either an FLT or FLC file.
-    file_type = os.path.basename(input_file).split('-')[-1].split('.')[0]
+    file_type = os.path.basename(input_file).split('_')[-1].split('.')[0]
     if file_type not in ['flt', 'flc']:
         raise ValueError(f'Input file is {file_type}, but only FLT or FLC '\
                          'files are valid.')
