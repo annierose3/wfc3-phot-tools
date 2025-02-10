@@ -198,14 +198,14 @@ def _write_cr_files(input_file, combined_hdr, output_dir, file_type,
 
     for i, new_hdu in enumerate(new_hdus):
         fname = os.path.basename(input_file).replace(f'{file_type}.',
-                                                     f'{new_file_type}.')
+                                                     f'{new_file_types[i]}.')
         output_path = os.path.join(output_dir, fname)
 
         if os.path.exists(output_path):
-            print(f'Overwriting previous version of {new_file_type.upper()} '\
+            print(f'Overwriting previous version of {new_file_types[i].upper()} '\
                   f'file: {output_path}')
         else:
-            print(f'Writing {new_file_type.upper()} file: {output_path}')
+            print(f'Writing {new_file_types[i].upper()} file: {output_path}')
 
         new_hdu.writeto(output_path)
 
