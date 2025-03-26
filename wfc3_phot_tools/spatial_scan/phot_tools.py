@@ -59,7 +59,7 @@ def _check_plot_filepath(filepath):
     default_filename = 'image.jpg'
     default_filepath = os.path.join(cwd, default_filename)
 
-    if (filepath == None) or (filepath == ''):
+    if (filepath is None) or (filepath == ''):
         message = 'No file name or path specified.\n'
         filepath = default_filepath
 
@@ -82,7 +82,7 @@ def _check_plot_filepath(filepath):
             dirname = os.path.dirname(filepath)
             # If there isn't a directory in the filepath:
             if dirname == '':     # if no directory specified, only file name
-                message = f'No directory specified.\n'
+                message = 'No directory specified.\n'
                 filepath = os.path.join(cwd, filepath)
             # If there is a directory in the filepath:
             else:
@@ -146,17 +146,16 @@ def aperture_photometry_scan(data, x_pos, y_pos, ap_width, ap_length,
     """
     copy_data = copy.deepcopy(data)
 
-    rect_ap = RectangularAperture((x_pos, y_pos), w=ap_width,
-                                  h=ap_length, theta=theta)
+    rect_ap = RectangularAperture((x_pos, y_pos), w=ap_width, h=ap_length,
+                                  theta=theta)
 
-    phot_table = aperture_photometry(copy_data, rect_ap,
-                                     method='exact')
+    phot_table = aperture_photometry(copy_data, rect_ap, method='exact')
     if show:
         mask = rect_ap.to_mask(method='center')
         data_cutout = mask.cutout(data)
         plt.title(plt_title)
-        z1, z2 = (-12.10630989074707, 32.53888328838081)
-        plt.imshow(data, origin='lower', vmin=z1, vmax=z2)
+        z_1, z_2 = (-12.10630989074707, 32.53888328838081)
+        plt.imshow(data_cutout, origin='lower', vmin=z_1, vmax=z_2)
         rect_ap.plot(color='white', lw=2)
         plt.show()
         plt.close()
@@ -164,9 +163,9 @@ def aperture_photometry_scan(data, x_pos, y_pos, ap_width, ap_length,
     return phot_table
 
 
-def calc_sky(data, x_pos, y_pos,
-             source_mask_len, source_mask_width,
-             n_pix=30, method='median'):
+def calc_sky(data, x_pos=None, y_pos=None,
+             source_mask_len=None, source_mask_width=None,
+             n_pix=30, method='median', data_is_cutout=False):
     """Calculates sky flux level in background rind.
 
     Calculates sky level in a rectangular annulus or "rind"
@@ -216,15 +215,22 @@ def calc_sky(data, x_pos, y_pos,
         level inside the sky aperture, in units of counts
         per second.
     """
-    rind_data = isolate_sky_rind(data, x_pos, y_pos,
-                                 source_mask_len, source_mask_width,
-                                 n_pix)
+    if data_is_cutout:
+        rind_data = data
+
+    else:
+        if any(val is None for key, val in locals().items()):
+            raise ValueError("in phot_tools.calc_sky(), no parameters are"\
+                             "allowed to be None when data_is_cutout is False")
+
+        rind_data = isolate_sky_rind(data, x_pos, y_pos, source_mask_len,
+                                     source_mask_width, n_pix)
 
     flat_dat = rind_data.flatten()
     # Only use data where value is not nan:
     flat_masked_dat = flat_dat[~np.isnan(flat_dat)]
 
-    clipped, low, upp = sigmaclip(flat_masked_dat)
+    clipped, _, _ = sigmaclip(flat_masked_dat)
     backrms = np.std(clipped)
     if method == 'median':
         back = np.median(clipped)
@@ -309,7 +315,7 @@ def detect_sources_scan(data,
     # create segmentation map.
     segm = detect_sources(data, threshold, npixels=npixels)
 
-    if segm == None:
+    if segm is None:
         props_tbl = None
 
     else:
@@ -317,19 +323,19 @@ def detect_sources_scan(data,
         props_tbl = props.to_table()
 
         if show or save:
-            fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15, 7))
-            ax[0].imshow(segm.data, origin='lower')
-            ax[0].set_title('segmentation map')
-            ax[1].scatter(props_tbl['xcentroid'],  props_tbl['ycentroid'],
-                          marker='x', s=100, c='r')
-            ax[1].imshow(data, origin='lower', cmap='Greys_r', norm=LogNorm())
-            ax[1].set_title('data')
+            fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(15, 7))
+            axes[0].imshow(segm.data, origin='lower')
+            axes[0].set_title('segmentation map')
+            axes[1].scatter(props_tbl['xcentroid'],  props_tbl['ycentroid'],
+                            marker='x', s=100, c='r')
+            axes[1].imshow(data, origin='lower', cmap='Greys_r', norm=LogNorm())
+            axes[1].set_title('data')
 
             title_str = f'{title}{len(props_tbl)} detected source'
             if len(props_tbl) > 1:
                 title_str = title_str+'s'
             plt.suptitle(title_str)
-            plt.tight_layout()
+            fig.tight_layout()
 
             if save:
                 filepath = _check_plot_filepath(filepath)
@@ -368,12 +374,12 @@ def isolate_sky_rind(data, x_pos, y_pos,
     """
     rind_data = copy.deepcopy(data)
 
-    ap_y = source_mask_len/2.
-    ap_x = source_mask_width/2.
+    ap_y = source_mask_len / 2.
+    ap_x = source_mask_width / 2.
 
     # mask inside inner boundary:
-    rind_data[int(y_pos-ap_y):int(y_pos+ap_y),
-              int(x_pos-ap_x):int(x_pos+ap_x)] = np.nan
+    rind_data[int(y_pos - ap_y):int(y_pos + ap_y),
+              int(x_pos - ap_x):int(x_pos + ap_x)] = np.nan
 
     # mask outside of 30 pixel rind:
 
